@@ -1,0 +1,55 @@
+# Development Dockerfile
+FROM php:8.3-fpm-alpine
+
+# Install system dependencies
+RUN apk add --no-cache \
+    curl \
+    libpng-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    sqlite \
+    sqlite-dev \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    nodejs \
+    npm
+
+# Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql pdo_sqlite gd xml pcntl
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+
+# Copy composer files
+COPY composer*.json ./
+
+# Copy application code (needed for artisan)
+COPY . .
+
+# Install PHP dependencies
+RUN composer install --no-scripts
+
+# Install Node dependencies
+RUN npm install
+
+# Run composer scripts after copying all files
+RUN composer dump-autoload
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage \
+    && chmod -R 755 /var/www/bootstrap/cache
+
+# Create SQLite database if it doesn't exist
+RUN touch /var/www/database/database.sqlite \
+    && chown www-data:www-data /var/www/database/database.sqlite
+
+# Expose ports
+EXPOSE 8000 5173
+
+# Default command
+CMD ["sh", "-c", "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve --host=0.0.0.0 --port=8000\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"]
