@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Development files
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Laravel specific
+/storage/*.key
+/storage/logs/*
+!/storage/logs/.gitkeep
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+
+# Build artifacts
+/public/build
+/public/hot
+/public/storage
+
+# Testing
+/tests/
+phpunit.xml
+.phpunit.result.cache
+
+# Documentation
+README.md
+*.md
+
+# Configuration that should not be in image
+.env.example
